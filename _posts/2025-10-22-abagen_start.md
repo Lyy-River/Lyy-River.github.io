@@ -2,7 +2,7 @@
 layout: post
 title: "Abagen 新手教程：安装、兼容性与常见问题全解"
 date: 2025-10-22
-categories: [Neuroimaging, Python]
+categories: [Neuroimaging]
 tags: [Abagen, Pandas, BrainAtlas, FreeSurfer]
 description: "详细讲解如何在新版 Python 与 Pandas 环境中使用 Abagen，解决 set_axis、append、KeyError '[0] not found in axis' 等常见问题。"
 author: "Yangyi Luo"
