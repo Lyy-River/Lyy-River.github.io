@@ -2,7 +2,7 @@
 layout: post
 title: "Abagen - 使用APARC.A2009S (Destrieux) Atlas 创建 Parcellation"
 date: 2025-10-23
-categories: [Neuroimaging, Tutorial]
+categories: [Neuroimaging]
 tags: [Abagen, Gene Expression, Python]
 description: "详细讲解如何使用 Abagen 处理 Allen Brain Atlas 基因表达数据，尤其是aparc.a2009s 的atlas。"
 author: "Yangyi Luo"
