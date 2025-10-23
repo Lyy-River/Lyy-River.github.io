@@ -4,6 +4,7 @@ title: "Abagen 新手教程：安装、兼容性与常见问题全解"
 date: 2025-10-22
 categories: [Neuroimaging]
 tags: [Abagen, Pandas, BrainAtlas, FreeSurfer]
+lang: zh
 author: "Yangyi Luo"
 ---
 
