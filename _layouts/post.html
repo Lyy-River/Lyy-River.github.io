@@ -1,0 +1,77 @@
+---
+layout: default
+---
+
+{% include base_path %}
+
+<div id="main" role="main">
+  {% include sidebar.html %}
+
+  <article class="post" itemscope itemtype="http://schema.org/CreativeWork">
+    <header class="post__header">
+      {% if page.title %}
+        <h1 class="post__title" itemprop="headline">{{ page.title }}</h1>
+      {% endif %}
+      {% if page.date %}
+        <p class="post__date"><i class="fa fa-calendar"></i> {{ page.date | date: "%B %d, %Y" }}</p>
+      {% endif %}
+      {% if page.tags %}
+        <p class="post__tags">
+          {% for tag in page.tags %}
+            <span class="post__tag">{{ tag }}</span>
+          {% endfor %}
+        </p>
+      {% endif %}
+    </header>
+
+    <section class="post__content" itemprop="text">
+      <div class="post__inner" style="max-width: 900px; margin: 0 auto; line-height: 1.7; font-size: 16px;">
+        {{ content }}
+      </div>
+    </section>
+
+    <footer class="post__meta">
+      {% if page.categories %}
+        <p>Categories: 
+          {% for cat in page.categories %}
+            <span class="post__category">{{ cat }}</span>{% unless forloop.last %}, {% endunless %}
+          {% endfor %}
+        </p>
+      {% endif %}
+      {% include post_pagination.html %}
+    </footer>
+
+    {% if site.comments.provider and page.comments %}
+      {% include comments.html %}
+    {% endif %}
+  </article>
+</div>
+
+<style>
+/* 美化博客内容 */
+.post__content img {
+  display: block;
+  margin: 1em auto;
+  max-width: 100%;
+}
+.post__content pre {
+  background: #f5f5f5;
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: 5px;
+}
+.post__content blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 1em;
+  color: #555;
+  margin: 1em 0;
+}
+.post__tags, .post__category {
+  display: inline-block;
+  background: #eee;
+  padding: 0.2em 0.5em;
+  margin: 0.2em;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+</style>
