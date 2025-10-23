@@ -12,6 +12,6 @@ author_profile: true
 - **Code:** [View on GitHub](https://github.com/Lyy-River/SEEG_project)  
 
 
-## ⚡ EEG + EMG Gesture Recognition  
+##  EEG + EMG Gesture Recognition  
 - **Description:** Built a multimodal BCI classifier integrating EEG and EMG data, achieving robust accuracy with CatBoost and CNN.  
 - **Code:** [View Repository](https://github.com/Lyy-River/EEG-EMG-BCI)  
