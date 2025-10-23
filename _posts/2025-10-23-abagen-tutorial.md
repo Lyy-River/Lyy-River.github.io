@@ -4,10 +4,9 @@ title: "Abagen - 使用APARC.A2009S (Destrieux) Atlas 创建 Parcellation"
 date: 2025-10-23
 categories: [Neuroimaging]
 tags: [Abagen, Gene Expression, Python]
-description: "详细讲解如何使用 Abagen 处理 Allen Brain Atlas 基因表达数据，尤其是aparc.a2009s 的atlas。"
 author: "Yangyi Luo"
 ---
-
+详细讲解如何使用 Abagen 处理 Allen Brain Atlas 基因表达数据创建 Parcellation并生成基因表达矩阵，尤其是APARC.A2009S (Destrieux) Atlas 。<!--more-->
 
 # Desikan-Killiany atlas 上的基因表达矩阵
 ## 1.使用体积分区(load the volumetric atlas )
