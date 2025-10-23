@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "Blog"
-permalink: /blog/
+title: "Blogs"
+permalink: /blogs/
 author_profile: true
 ---
