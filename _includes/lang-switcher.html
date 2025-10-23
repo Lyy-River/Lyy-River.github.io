@@ -1,0 +1,5 @@
+{% if page.lang == "zh" %}
+  <a href="{{ page.url | replace: '-zh', '' }}" class="lang-switch">🇬🇧 English</a>
+{% elsif page.lang == "en" %}
+  <a href="{{ page.url | append: '-zh' }}" class="lang-switch">🇨🇳 中文</a>
+{% endif %}
