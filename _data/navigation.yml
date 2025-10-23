@@ -17,8 +17,7 @@ main:
   #- title: "Teaching"
   #  url: /teaching/    
     
-  - title: "Coding Projects"
-    url: /coding/
+
         
   #- title: "Blog Posts"
   #  url: /year-archive/
@@ -28,9 +27,12 @@ main:
 
   - title: "Projects"  
     url: /projects/
-
-  # - title: "Blogs"
-  #   url: /blogs/
+    
+  - title: "Coding Projects"
+    url: /coding/
+    
+  - title: "Blogs"
+    url: /blogs/
 
   - title: "Hobbies"  
     url: /hobby/
