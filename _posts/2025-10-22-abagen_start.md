@@ -10,6 +10,8 @@ author: "Yangyi Luo"
 
 详细讲解如何在新版 Python 与 Pandas 环境中使用 Abagen，解决 set_axis、append、KeyError '[0] not found in axis' 等常见问题。<!--more-->
 
+相关代码和数据已经上传至[mygithub](https://github.com/Lyy-River/abagen-destrieux-tutorial)
+
 ##  简介
 
 [`abagen`](https://github.com/netneurolab/abagen) 是一个用于从 **Allen Human Brain Atlas (AHBA)** 下载与处理人脑基因表达数据的 Python 包。
