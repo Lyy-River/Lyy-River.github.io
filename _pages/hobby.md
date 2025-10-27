@@ -13,9 +13,16 @@ I love observing the night sky, exploring stars, planets, and galaxies.
 Outdoor Activities
 ------
 Hiking, rock climbing, and exploring mountains.
-![Hiking](/images/hiking.jpg)
+
+<p align="center">
+  <img src="/images/hiking.jpg" alt="Hiking" width=40%">
+</p>
 
 Handicrafts
 ------
 Making handmade decorations and small DIY projects.
-![bee](/images/bee.jpg)(/images/bee1.jpg)
+
+<p align="center">
+  <img src="/images/bee.jpg" alt="Bee spaceman" width="40%" style="margin-right:10px;">
+  <img src="/images/bee1.jpg" alt="Bee" width="40%">
+</p>
