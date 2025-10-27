@@ -16,7 +16,9 @@ My current work involves **multimodal neural data analysis** (EEG, EMG, sMRI, SE
 Looking ahead, I am particularly interested in **closed-loop BCI systems** that combine **VR/AR and human–computer interaction**, and in exploring **olfactory interfaces** as a novel pathway for sensory feedback.  Ultimately, I aim to contribute to the development of **multimodal immersive BCIs** that deepen our understanding of brain–machine integration and enhance human sensory experiences.
 
 
-**Interests**
+
+
+## **Interests**
 
 - Brain–Computer Interfaces (BCI)  
 - Multimodal neural data: EEG, EMG, sMRI, fMRI, SEEG  
