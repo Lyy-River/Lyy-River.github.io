@@ -7,11 +7,11 @@ author_profile: true
 
 
 
-## SEEG 节点筛选与 DTF 分析项目  
-- **Description:** 本项目用于基于 SEEG（脑电深部电极信号）的节点选择与频域动态因果分析（DTF），包括数据读取、预处理、能量比 (ER) 计算、变点检测、EI指标计算、以及基于出度入度的聚类可视化。  
+## SEEG Node Selection and DTF Analysis Project
+- **Description:** This project focuses on node selection and frequency-domain Dynamic Causal Analysis (DTF) based on SEEG (stereo-electroencephalography) signals. It includes data loading, preprocessing, Energy Ratio (ER) computation, change-point detection, Epileptogenicity Index (EI) calculation, and clustering visualization based on out-degree and in-degree metrics.
 - **Code:** [View on GitHub](https://github.com/Lyy-River/SEEG_project)  
 
 
-##  EEG + EMG Gesture Recognition  
-- **Description:** Built a multimodal BCI classifier integrating EEG and EMG data, achieving robust accuracy with CatBoost and CNN.  
-- **Code:** [View Repository](https://github.com/Lyy-River/EEG-EMG-BCI)  
+##  abagen-destrieux-tutorial
+- **Description:** Tutorial for generating a gene expression matrix based on the Destrieux (aparc.a2009s) atlas using ABAGEN.
+- **Code:** [View on GitHub](https://github.com/Lyy-River/abagen-destrieux-tutorial)
