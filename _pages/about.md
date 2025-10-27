@@ -15,6 +15,7 @@ I am a graduated student from Hunan university, majoring in statistics. My resea
 
 
 **Interests**
+
 Brain–Computer Interfaces (BCI)  
 Multimodal neural data: EEG, EMG, sMRI, fMRI, SEEG  
 Neural decoding and multisensory integration  
