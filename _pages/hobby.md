@@ -15,7 +15,8 @@ Outdoor Activities
 Hiking, rock climbing, and exploring mountains.
 
 <p align="center">
-  <img src="images/hiking.jpg" alt="Hiking" width="40%">
+  <img src="/images/hiking.jpg" alt="Hiking" width="40%" style="margin-right:10px;">
+  <img src="/images/rocking.jpg" alt="Climbing" width="40%">
 </p>
 
 Handicrafts
