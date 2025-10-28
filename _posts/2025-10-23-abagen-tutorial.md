@@ -8,6 +8,7 @@ lang: zh
 author: "Yangyi Luo"
 ---
 详细讲解如何使用 Abagen 处理 Allen Brain Atlas 基因表达数据创建 Parcellation并生成基因表达矩阵，尤其是APARC.A2009S (Destrieux) Atlas 。<!--more-->
+
 相关代码和数据已经上传至[github](https://github.com/Lyy-River/abagen-destrieux-tutorial)。
 # Desikan-Killiany atlas 上的基因表达矩阵
 ## 1.使用体积分区(load the volumetric atlas )
