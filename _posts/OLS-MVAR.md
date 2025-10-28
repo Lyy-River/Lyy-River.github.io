@@ -1,0 +1,429 @@
+
+# 多变量自回归模型（MVAR）阶数选择与系数估计
+## 一、引言
+
+现代时序分析中，**多变量自回归（MVAR）模型**是常用的工具之一。一个合理的 MVAR 模型既要估计出可靠的系数，也要选定合适的滞后阶数。
+本教程的目标在于：
+
+* 掌握 MVAR 系数估计（OLS／最大似然）的基本方法与推导思路；
+* 理解 FPE、AIC、HQ、SC 等信息准则在 MVAR 阶数选择中的作用与推导逻辑；
+* 演示如何在仿真数据上做 OLS 推断，并结合 `statsmodels` 库实现模型拟合与准则提取。
+
+---
+
+## 二、MVAR 模型概述
+
+### 2.1 模型定义
+
+设 $\{\mathbf{y}_t\}$ 为 $K$ 维的向量时间序列，MVAR($p$) 模型可写为：
+
+$$
+\mathbf{y}_t \;=\; A_1\,\mathbf{y}_{t-1} \;+\; A_2\,\mathbf{y}_{t-2} \;+\;\cdots+\; A_p\,\mathbf{y}_{t-p} \;+\; \mathbf{u}_t,
+$$
+
+* $\mathbf{y}_t\in\mathbb{R}^K$：时刻 $t$ 的观测向量（共 $K$ 个通道）。
+* $A_\ell\in\mathbb{R}^{K\times K}$：第 $\ell$ 阶系数矩阵。
+* $\{\mathbf{u}_t\}$ 为均值为零、协方差矩阵 $\Sigma_u$ 的多元白噪声。
+
+记号说明：
+
+* $T$：总样本长度（从 $t=1$ 到 $t=T$）。
+* $p$：模型阶数（即考虑的最大滞后步数）。
+
+---
+
+## 三、MVAR 系数估计方法
+
+本节重点推导\*\*多元最小二乘（OLS）\*\*的系数估计，并简要提及最大似然估计（ML）的思路。
+
+### 3.1 OLS 估计的推导
+
+#### 3.1.1 构造矩阵形式
+
+1. **响应（因变量）矩阵 $Y$：**
+
+   $$
+   Y \;=\; \begin{bmatrix}
+      \mathbf{y}_{p+1}^T \\
+      \mathbf{y}_{p+2}^T \\
+      \;\vdots\; \\
+      \mathbf{y}_{T}^T
+   \end{bmatrix}
+   \;\in\;\mathbb{R}^{(T-p)\times K}.
+   $$
+
+   每一行就是对应时刻 $t=p+1,\dots,T$ 的 $K$ 维观测。
+   $\mathbf{y}_{t}^T =  [{y}_{t}^{(1)},{y}_{t}^{(2)}, ...,{y}_{t}^{(K)}]^T$
+
+2. **自变量矩阵 $Z$：**
+   首先定义每个时刻的拼接向量
+
+   $$
+   \mathbf{z}_t \;=\; 
+   \begin{bmatrix}
+     \mathbf{y}_{t-1}^T & \mathbf{y}_{t-2}^T & \cdots & \mathbf{y}_{t-p}^T
+   \end{bmatrix}^T 
+   \;\in\;\mathbb{R}^{Kp},
+   \quad t=p+1,\dots,T.
+   $$
+
+   然后拼成
+
+   $$
+   Z \;=\; 
+   \begin{bmatrix}
+     \mathbf{z}_{p+1}^T \\
+     \mathbf{z}_{p+2}^T \\
+     \;\vdots\; \\
+     \mathbf{z}_{T}^T
+   \end{bmatrix}
+   \;\in\;\mathbb{R}^{(T-p)\times (Kp)}.
+   $$
+
+3. **矩阵回归形式：**
+   将所有滞后系数按列堆叠成
+
+   $$
+   A \;=\;
+   \begin{bmatrix}
+     A_1 \\[4pt]
+     A_2 \\[4pt]
+     \vdots \\[4pt]
+     A_p
+   \end{bmatrix}
+   \;\in\;\mathbb{R}^{(Kp)\times K},
+   $$
+
+   则总体回归模型可写作
+
+   $$
+   Y \;=\; Z\,A \;+\; U,\quad 
+   U\;=\;\begin{bmatrix} \mathbf{u}_{p+1}^T \\ \vdots \\ \mathbf{u}_T^T \end{bmatrix}.
+   $$
+
+#### 3.1.2 最小二乘解
+
+目标是最小化残差平方和：
+
+$$
+\min_{A} \;\mathrm{tr}\bigl[(Y - Z\,A)^T (Y - Z\,A)\bigr].
+$$
+
+对 $A$ 求导并令导数为零，可得经典的 OLS 解：
+
+$$
+\widehat{A} \;=\; (Z^T Z)^{-1}\,Z^T\,Y.
+$$
+
+* $\widehat{A}\in\mathbb{R}^{(Kp)\times K}$。
+* 推导要点：将 $\mathrm{tr}[(Y - ZA)^T (Y - ZA)]$ 对 $A$ 的偏导数设为零。
+* 常用矩阵求导公式：
+1. **常数项（和 A 无关）**
+    $\frac{\partial}{\partial A} \mathrm{tr}(C) = 0$
+2. **线性项：**
+    $\frac{\partial}{\partial A} \mathrm{tr}(A^T B) = B \quad \text{或} \quad \frac{\partial}{\partial A} \mathrm{tr}(B^T A) = B$
+3. **二次项（最重要）**
+    $A\frac{\partial}{\partial A} \mathrm{tr}(A^T M A) = M A + M^T A$
+    如果 M是对称矩阵（如 $Z^T Z$），则：
+    $A\frac{\partial}{\partial A} \mathrm{tr}(A^T M A) = 2 M A$
+ $$J(A)=\mathrm{tr}[(Y - ZA)^T (Y - ZA)]$$
+$$\frac{\partial J}{\partial A} = -2 Z^T Y + 2 Z^T Z A$$
+令$\frac{\partial J}{\partial A} =0$,得到$\widehat{A} \;=\; (Z^T Z)^{-1}\,Z^T\,Y.$
+
+#### 3.1.3 残差与协方差估计
+
+1. 计算残差矩阵：
+
+   $$
+   \widehat{U} \;=\; Y \;-\; Z\,\widehat{A} \;\in\;\mathbb{R}^{(T-p)\times K}.
+   $$
+2. 估计白噪声协方差：
+
+   $$
+   \widehat{\Sigma}_u \;=\; \frac{1}{\,T - K\,p\,}\;\widehat{U}^T\,\widehat{U}.
+   $$
+
+   其中分母用 $T - Kp$（残差自由度）来修正偏差。
+
+---
+
+## 四、MVAR 阶数选择准则
+
+选定合适的阶数 $p$ 对模型性能影响巨大。常见的几种信息准则如下，它们都是在拟合优度与模型复杂度之间权衡的度量。
+
+### 4.1 准则总体思想
+
+假设已对不同候选阶数 $m=0,1,2,\dots$ 都拟合出残差协方差矩阵 $\widehat{\Sigma}_u(m)$，则各准则可度量不同阶数下模型的“惩罚后拟合效果”。一般而言：
+
+* 当 $m$ 增大时，$\ln|\widehat{\Sigma}_u(m)|$ 会下降（拟合更好）；
+* 但过大的 $m$ 会引入过多参数，需要在项数惩罚与拟合优度之间平衡。
+
+### 4.2 各准则公式
+
+设 $K$ 为变量维数，$T$ 为样本总长，则：
+
+1. **最终预测误差（FPE, Final Prediction Error）**
+
+   $$
+   \mathrm{FPE}(m) 
+   = \Bigl(\frac{\,T + K m + 1\,}{\,T - K m - 1\,}\Bigr)^K \,\det\bigl(\widehat{\Sigma}_u(m)\bigr).
+   $$
+
+   * 直观理解：当阶数 $m$ 增加，$\det(\widehat{\Sigma}_u)$ 可以下降，但 $\frac{T + Km + 1}{T - Km - 1}$ 会增大，两者共同决定最佳 $m$。
+
+2. **Akaike 信息准则（AIC）**
+
+   $$
+   \mathrm{AIC}(m) 
+   = \ln \bigl|\widehat{\Sigma}_u(m)\bigr| \;+\; \frac{2\,m\,K^2}{T}.
+   $$
+
+   * 惩罚项为 $\frac{2\,\text{自由参数数}}{T} = \frac{2\,m\,K^2}{T}$。
+  
+**第一项：$\ln \left| \widehat{\Sigma}_u \right|$**
+- 这是估计出来的 **误差协方差矩阵** 的行列式的对数。
+- **越小代表模型拟合越好**（残差越小，协方差越小）。
+- 实际上，这部分对应 **似然函数的负对数最大值**（最大似然估计时常见的负 log-likelihood）。
+  
+**第二项：$\frac{2mK^2}{T}$ 是惩罚项**
+- K：每个时间点观测变量的个数（维度）。
+- m：VAR 的滞后阶数。
+- 每个 $A_i$是一个 $K \times K$ 的矩阵 →$K^2$ 个参数。
+- 总共有 m 个这样的 $A_i$→ 一共 $mK^2$ 个参数。
+- T：有效样本个数（通常为原始时间长度减去滞后阶 m）。为了**标准化样本规模影响除以 T**。
+> 惩罚项是越复杂（自由参数越多），惩罚越大；样本越多，这种惩罚越小。
+3. **Hannan–Quinn 准则（HQ）**
+
+   $$
+   \mathrm{HQ}(m) 
+   = \ln \bigl|\widehat{\Sigma}_u(m)\bigr| 
+   \;+\; \frac{2\,m\,K^2\,\ln\ln T}{T}.
+   $$
+
+   * 惩罚项中包含 $\ln\ln T$，收敛速度介于 AIC 与 BIC 之间。
+
+4. **Schwarz 信息准则／贝叶斯信息准则（SC／BIC）**
+
+   $$
+   \mathrm{SC}(m) 
+   = \ln \bigl|\widehat{\Sigma}_u(m)\bigr| 
+   \;+\; \frac{\,m\,K^2\,\ln T\,}{T}.
+   $$
+
+   * 惩罚项更激进，适合大样本下做**一致性**选择。
+
+### 4.3 不同准则的性质与比较
+
+* **一致性**：当 $T \to \infty$ 时，HQ 与 SC 都能一致地选出真实阶数；而 AIC 和 FPE 在大样本下一致性较差，但在有限样本下往往有更好的预测性能。
+* **短样本预测性能**：AIC（或等价的 FPE 指标）通常能给出更小的预测误差；SC 偏向保守，倾向选出较小的阶数。
+* **惩罚力度大小顺序**（同 $m,K,T$ 下）：
+
+  $$
+  \text{AIC 惩罚} = \frac{2mK^2}{T} 
+  \;<\; 
+  \text{HQ 惩罚} = \frac{2mK^2\,\ln\ln T}{T} 
+  \;<\; 
+  \text{SC 惩罚} = \frac{mK^2\,\ln T}{T}.
+  $$
+
+---
+
+## 五、OLS 过程示例演示
+
+下面用一个简单的仿真案例，演示如何构造多维时间序列并做 OLS 拟合，最后计算阶数选择准则值。
+
+### 5.1 仿真数据生成
+
+1. **参数设定**
+
+   ```python
+   T = 100    # 样本总长度
+   K = 3      # 变量维度
+   p_true = 2 # 真实滞后阶数
+   ```
+2. **真实系数矩阵**
+
+   ```python
+   import numpy as np
+
+   A1 = np.array([[0.5, 0.1, 0.0],
+                  [0.0, 0.4, 0.1],
+                  [0.2, 0.0, 0.3]])
+   A2 = np.array([[0.2, 0.0, 0.0],
+                  [0.1, 0.1, 0.0],
+                  [0.0, 0.2, 0.1]])
+   ```
+3. **初始化与噪声**
+
+   ```python
+   Y = np.zeros((T, K))
+   noise = np.random.normal(0, 0.1, size=(T, K))
+   ```
+4. **生成 MVAR(2) 数据**
+
+   ```python
+   for t in range(p_true, T):
+       Y[t] = A1 @ Y[t - 1] + A2 @ Y[t - 2] + noise[t]
+    # 转为 DataFrame 供 VAR 模型使用
+    Y_df = pd.DataFrame(Y, columns=[f'y{i+1}' for i in range(K)])
+   ```
+
+   * 这样就得到一个 $T\times K$ 的仿真矩阵 `Y`，其中前两行可视为初始化（置零或其它），后续由 MVAR(2) 递推生成。
+
+### 5.2 构造 OLS 估计所需矩阵
+使用AIC选取阶数 $p=2$ 
+![alt text](image.png)
+
+
+
+1. **响应矩阵 $Y_{\mathrm{resp}}$：**
+
+   $$
+   Y_{\mathrm{resp}} = 
+   \begin{bmatrix}
+     \mathbf{y}_{3}^T \\[2pt]
+     \mathbf{y}_{4}^T \\[-2pt]
+     \vdots       \\[-2pt]
+     \mathbf{y}_{100}^T
+   \end{bmatrix}
+   \;\in\;\mathbb{R}^{98\times 3}.
+   $$
+
+   对应 Python 代码：
+
+   ```python
+   p = 2
+   Y_resp = Y_df[p:T, :]  # 从索引2对应的第3行开始，到第100行
+   ```
+2. **自变量矩阵 $Z$：**
+   每一行 $\mathbf{z}_t = [y_{t-1}^T,\; y_{t-2}^T]^T$。
+
+   ```python
+   Z = []
+   for t in range(p, T):
+       zt = np.hstack([Y[t - i - 1] for i in range(p)])
+       Z.append(zt)
+   Z = np.array(Z)  # 形状 (98, 6)
+   ```
+   - 自变量矩阵: $Z = [\mathbf{z}_{p+1}, ..., \mathbf{z}_T]^T \in \mathbb{R}^{(T-p)\times (Kp)}$。这里每一行长度为 $Kp=3\times2=6$，共 98 行。
+    - $Z = [\mathbf{z}_{3}, ..., \mathbf{z}_{100}]^T \in \mathbb{R}^{98\times 6}$
+      - 其中$\mathbf{z}_t = [\mathbf{y}_{t-1}^T, \mathbf{y}_{t-2}^T, ..., \mathbf{y}_{t-p}^T]^T$
+      - 例如$\mathbf{z}_{3} = [\mathbf{y}_{2}^T, \mathbf{y}_{1}^T]^T$，$\mathbf{z}_{4} = [\mathbf{y}_{3}^T, \mathbf{y}_{2}^T]^T$,....,$\mathbf{z}_{100} = [\mathbf{y}_{99}^T, \mathbf{y}_{98}^T]^T$
+### 5.3 OLS 求解与残差协方差估计
+
+1. **最小二乘解**
+
+   $$
+   \widehat{A} = (Z^T Z)^{-1} Z^T Y_{\mathrm{resp}}.
+   $$
+
+   对应 Python：
+
+   ```python
+   from numpy.linalg import inv
+
+   # 计算 (Z^T Z)^{-1} Z^T Y_resp
+   ZTZ_inv = inv(Z.T @ Z)           # 形状 (6, 6)
+   A_hat   = ZTZ_inv @ (Z.T @ Y_resp)  # 形状 (6, 3)
+   ```
+2. **残差与协方差**
+
+   ```python
+   U_hat = Y_resp - Z @ A_hat       # 残差矩阵 (98, 3)
+   Sigma_u_hat = (U_hat.T @ U_hat) / (T - K*p)  # 形状 (3, 3)
+   ```
+3. **示例输出**
+
+   ```text
+   >>> 估计得到的 A_hat：
+   [[ 0.44322097, -0.03244340,  0.24283581],
+    [ 0.09156503,  0.42128354, -0.23783146],
+    [-0.02563931,  0.14293710,  0.28324623],
+    [ 0.24727987, -0.00598260, -0.01597143],
+    [ 0.05656489,  0.06289534,  0.27966596],
+    [-0.01348244,  0.03772565,  0.27168392]]
+   ```
+
+   * 上述 $A_{\text{hat}}$ 中前 3 行即为 $\widehat{A}_1$，后 3 行即为 $\widehat{A}_2$。
+
+
+
+
+
+
+### 5.4 使用 `statsmodels.tsa.VAR` 拟合 MVAR
+
+`statsmodels` 的 `VAR` 类可以方便地实现 MVAR 拟合与信息准则提取。
+
+```python
+from statsmodels.tsa.api import VAR
+
+# data是最开始构造的 MVAR 3维时间序列：
+data = Y_df.copy()
+model = VAR(data)
+
+# 1) 自动选择阶数
+order_res = model.select_order(maxlags=5)
+print(order_res.summary())  
+# summary 中会输出各阶数对应的 AIC, BIC, HQ 以及选择结果
+
+# 2) 按 AIC 选择得到的阶数进行拟合
+p_opt = order_res.selected_orders['aic']
+result = model.fit(p_opt，trend='n')
+
+# 3) 查看估计的系数矩阵
+print(result.params)  
+```
+
+* `order_res.selected_orders` 会返回一个字典，包含 `'aic'`、`'hqic'`、`'bic'` 等对应的最佳阶数。
+* `result.params` 是一个 DataFrame，列名对应每个滞后系数矩阵的展开形式（如 `L1.y1`, `L2.y1`, …），最后一列通常是截距项（若含趋势/截距）。
+  
+示例输出
+```
+VAR Order Selection (* highlights the minimums) 
+=================================================
+      AIC         BIC         FPE         HQIC   
+-------------------------------------------------
+0      -13.00      -12.92   2.257e-06      -12.97
+1      -13.74     -13.42*   1.080e-06     -13.61*
+2     -13.77*      -13.20  1.049e-06*      -13.54
+3      -13.64      -12.84   1.190e-06      -13.32
+4      -13.54      -12.49   1.329e-06      -13.11
+5      -13.43      -12.14   1.483e-06      -12.91
+-------------------------------------------------
+             y1        y2        y3
+L1.y1  0.443221 -0.032443  0.242836
+L1.y2  0.091565  0.421284 -0.237831
+L1.y3 -0.025639  0.142937  0.283246
+L2.y1  0.247280 -0.005983 -0.015971
+L2.y2  0.056565  0.062895  0.279666
+L2.y3 -0.013482  0.037726  0.271684
+```
+
+### `VAR.fit(...)` 函数签名
+
+在 `statsmodels` 中，`VAR.fit` 的函数签名如下（示例自源码参考 Lütkepohl pp.146–153）：
+
+```python
+def fit(
+    self,
+    maxlags: int | None = None,
+    method: str = "ols",
+    ic: str | None = None,
+    trend: str = "c",
+    verbose: bool = False,
+)
+```
+
+* **参数说明**
+
+  * `maxlags`：如果传入整数，则在 `1..maxlags` 范围内自动选阶；如果为 `None`，则需先通过 `select_order` 指定。
+  * `method`：估计方法，默认为 `"ols"`；也可选择 `"mle"`（最大似然）。
+  * `ic`：若指定为 `'aic'`、`'bic'`、`'hqic'` 等，则直接返回该信息准则最优的结果。
+  * `trend`：模型中是否包含截距或趋势项，常用值包括 `"c"`（常数项）、`"ct"`（常数+趋势）等。
+  * `verbose`：是否输出更多拟合信息。
+
+* **参考文献**
+
+  > Lütkepohl, H. (2005). *New Introduction to Multiple Time Series Analysis*, pp. 146–153.
+
