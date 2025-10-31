@@ -363,3 +363,6 @@ languages:
   en: "English"
   zh: "中文"
 default_lang: "en"
+
+excerpt_separator: "<!--more-->"
+
