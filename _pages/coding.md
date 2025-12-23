@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "title: "Open Research Code and Data"
+title: "Open Research Code and Data"
 permalink: /coding/
 author_profile: true
 ---
